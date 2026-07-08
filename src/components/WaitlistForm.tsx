@@ -2,6 +2,8 @@
 
 import { useState, type FormEvent } from "react";
 import { getHeadlineVariant, trackEvent } from "@/lib/ab";
+import { supabase, PG_UNIQUE_VIOLATION, type WaitlistEntry } from "@/lib/supabase";
+import { PRICING_VOTE_KEY } from "./PricingPoll";
 
 const featureOptions = [
   "Morning dua alarm",
@@ -17,50 +19,88 @@ const memberPerks = [
   "A say in which duas and features come first",
 ];
 
-export default function WaitlistForm() {
-  const [submitted, setSubmitted] = useState(false);
+type Status =
+  | "idle" // form showing, nothing submitted yet
+  | "submitting" // insert in flight — button disabled
+  | "success" // saved to Supabase (or dev fallback)
+  | "duplicate" // email already on the list — friendly, not an error
+  | "error"; // something went wrong — form stays filled for retry
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+export default function WaitlistForm() {
+  const [status, setStatus] = useState<Status>("idle");
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (status === "submitting") return;
 
     const formData = new FormData(event.currentTarget);
-    const entry = {
-      name: formData.get("name"),
-      email: formData.get("email"),
-      mostExcitedAbout: formData.get("feature"),
-      headlineVariant: getHeadlineVariant(),
-      submittedAt: new Date().toISOString(),
+
+    // Normalize the email so "Zair@Gmail.com" and "zair@gmail.com" are the
+    // same person — pairs with the unique lower(email) index in schema.sql.
+    const email = String(formData.get("email")).trim().toLowerCase();
+
+    const entry: WaitlistEntry = {
+      name: String(formData.get("name")).trim(),
+      email,
+      preferred_feature: String(formData.get("feature")),
+      // Their $3.99/month poll answer, if they voted (null otherwise).
+      pricing_response: localStorage.getItem(PRICING_VOTE_KEY),
+      // headline_variant: getHeadlineVariant(), // uncomment along with the
+      //                                         // column in supabase/schema.sql
     };
 
-    // Logged with the visitor's headline variant so you can compare
-    // signup conversion across headlines A/B/C (see src/lib/ab.ts).
-    trackEvent("waitlist_signup", entry);
+    // Supabase not configured yet? (missing .env.local — see src/lib/supabase.ts)
+    // Fall back to console logging so the page still works in development.
+    if (!supabase) {
+      console.warn(
+        "[Dua Alarm] Supabase is NOT configured — this signup was logged " +
+          "to the console only and has NOT been saved. Follow the setup " +
+          "checklist in src/lib/supabase.ts.",
+      );
+      trackEvent("waitlist_signup", { ...entry, savedTo: "console-only" });
+      setStatus("success");
+      return;
+    }
 
-    // TODO: Connect a real backend. Two easy options:
-    //
-    // Option A — Supabase:
-    //   1. `npm install @supabase/supabase-js`
-    //   2. Create a `waitlist` table (name text, email text, feature text,
-    //      headline_variant text, created_at timestamptz).
-    //   3. Add NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY to .env.local.
-    //   4. Replace the trackEvent above with:
-    //        await supabase.from("waitlist").insert(entry);
-    //
-    // Option B — ConvertKit (email list):
-    //   1. Create a form in ConvertKit and grab its form ID + API key.
-    //   2. POST to https://api.convertkit.com/v3/forms/<FORM_ID>/subscribe
-    //      with { api_key, email, first_name } — ideally from a Next.js
-    //      route handler (src/app/api/waitlist/route.ts) so the key stays
-    //      server-side. Pass the headline variant as a subscriber tag/field.
+    setStatus("submitting");
+    setErrorMessage(null);
 
-    setSubmitted(true);
+    const { error } = await supabase.from("waitlist").insert(entry);
+
+    if (!error) {
+      trackEvent("waitlist_signup", {
+        email,
+        headlineVariant: getHeadlineVariant(),
+      });
+      setStatus("success");
+      return;
+    }
+
+    // Duplicate email — the unique index rejected the insert. They're
+    // already on the list, so treat it as good news, not a failure.
+    if (error.code === PG_UNIQUE_VIOLATION) {
+      trackEvent("waitlist_duplicate", { email });
+      setStatus("duplicate");
+      return;
+    }
+
+    // Anything else: network issue, RLS misconfiguration, etc.
+    // Keep the form filled so they can simply press the button again.
+    console.error("[Dua Alarm] Waitlist insert failed:", error);
+    setErrorMessage(
+      "Something went wrong on our end — please try again in a moment.",
+    );
+    setStatus("error");
   }
+
+  const isDone = status === "success" || status === "duplicate";
 
   return (
     <section id="waitlist" className="bg-cream py-16 md:py-24">
       <div className="mx-auto max-w-xl px-5 sm:px-6">
         <div className="rounded-3xl border border-cream-dark bg-white/70 p-7 shadow-lg shadow-night/5 sm:p-10">
-          {submitted ? (
+          {isDone ? (
             <div className="py-8 text-center" aria-live="polite">
               <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-emerald-deep/10">
                 <svg
@@ -76,14 +116,29 @@ export default function WaitlistForm() {
                   <path d="m5 12.5 4.5 4.5L19 7.5" />
                 </svg>
               </div>
-              <h3 className="mt-5 font-display text-2xl font-semibold text-night">
-                JazakAllahu khayran — you&apos;re in!
-              </h3>
-              <p className="mt-3 leading-relaxed text-ink-soft">
-                You&apos;re on the founding list. We&apos;ll email you the
-                moment Dua Alarm is ready — and your free Premium will be
-                waiting. Keep us in your duas.
-              </p>
+              {status === "success" ? (
+                <>
+                  <h3 className="mt-5 font-display text-2xl font-semibold text-night">
+                    JazakAllahu khayran — you&apos;re in!
+                  </h3>
+                  <p className="mt-3 leading-relaxed text-ink-soft">
+                    You&apos;re on the founding list. We&apos;ll email you the
+                    moment Dua Alarm is ready — and your free Premium will be
+                    waiting. Keep us in your duas.
+                  </p>
+                </>
+              ) : (
+                <>
+                  <h3 className="mt-5 font-display text-2xl font-semibold text-night">
+                    You&apos;re already on the list!
+                  </h3>
+                  <p className="mt-3 leading-relaxed text-ink-soft">
+                    This email is already signed up — no need to do anything
+                    else. We&apos;ll be in touch the moment Dua Alarm is ready,
+                    insha&apos;Allah.
+                  </p>
+                </>
+              )}
             </div>
           ) : (
             <>
@@ -180,10 +235,20 @@ export default function WaitlistForm() {
 
                 <button
                   type="submit"
-                  className="mt-1 rounded-full bg-emerald-deep px-8 py-4 text-base font-bold text-cream shadow-lg shadow-emerald-deep/25 transition-all hover:-translate-y-0.5 hover:bg-emerald-soft"
+                  disabled={status === "submitting"}
+                  className="mt-1 rounded-full bg-emerald-deep px-8 py-4 text-base font-bold text-cream shadow-lg shadow-emerald-deep/25 transition-all hover:-translate-y-0.5 hover:bg-emerald-soft disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0"
                 >
-                  Get Early Access
+                  {status === "submitting" ? "Joining…" : "Get Early Access"}
                 </button>
+
+                {status === "error" && errorMessage && (
+                  <p
+                    role="alert"
+                    className="rounded-xl bg-red-50 px-4 py-3 text-center text-sm font-medium text-red-800 ring-1 ring-red-200"
+                  >
+                    {errorMessage}
+                  </p>
+                )}
 
                 <p className="text-center text-xs text-ink-soft/70">
                   No spam, ever. One email when we launch — that&apos;s it.

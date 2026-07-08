@@ -68,22 +68,36 @@ npm run start   # serve the production build
 npm run lint    # lint
 ```
 
-## Connecting real data collection
+## Supabase setup (waitlist storage)
 
-Right now, submissions are logged with `console.log` so you can test the flow.
-The integration points are marked with `TODO` comments in:
+The waitlist form saves signups to a Supabase `waitlist` table
+(id, name, email, preferred_feature, pricing_response, created_at),
+with duplicate emails rejected case-insensitively at the database level.
+One-time setup, ~5 minutes:
 
-- [`src/components/WaitlistForm.tsx`](src/components/WaitlistForm.tsx) — waitlist signups (Supabase or ConvertKit instructions inline)
-- [`src/components/PricingPoll.tsx`](src/components/PricingPoll.tsx) — pricing poll votes
+1. **Create a project** — free at [supabase.com](https://supabase.com).
+2. **Create the table** — open **SQL Editor** in your project, paste the
+   contents of [`supabase/schema.sql`](supabase/schema.sql), and click Run.
+   This creates the table, the unique-email index, and Row Level Security
+   policies (anonymous visitors can insert but never read the list).
+3. **Add your keys** — copy `.env.local.example` to `.env.local` and fill in
+   your Project URL and anon key (found under **Project Settings → API**).
+4. **Restart** `npm run dev`.
 
-**Supabase (quick version):** create a project, add a `waitlist` table, put
-`NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` in `.env.local`,
-`npm install @supabase/supabase-js`, and replace the `console.log` with an
-`insert` call.
+Until you complete step 3, the form falls back to `console.log` (with a
+`console.warn` reminder) so the page still works in development — but nothing
+is saved.
 
-**ConvertKit:** create a form, then POST subscribers to the ConvertKit API from
-a route handler (`src/app/api/waitlist/route.ts`) so your API key stays
-server-side.
+How the pieces fit:
+
+- [`src/lib/supabase.ts`](src/lib/supabase.ts) — the client (null until env vars are set)
+- [`src/components/WaitlistForm.tsx`](src/components/WaitlistForm.tsx) — insert + loading / success / duplicate / error states
+- [`src/components/PricingPoll.tsx`](src/components/PricingPoll.tsx) — stores the visitor's $3.99 vote locally; the form attaches it to their signup row as `pricing_response`
+- View signups in the Supabase dashboard → **Table Editor → waitlist**
+
+To also attribute signups to a headline variant, uncomment the
+`headline_variant` column in `schema.sql` and the matching line in
+`WaitlistForm.tsx`.
 
 ## Deploying to Vercel
 
@@ -108,8 +122,9 @@ vercel          # first deploy (accept the defaults)
 vercel --prod   # production deploy
 ```
 
-If you later add Supabase/ConvertKit keys, set them in
-**Vercel → Project → Settings → Environment Variables** and redeploy.
+Set `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` in
+**Vercel → Project → Settings → Environment Variables** (same values as your
+`.env.local`) and redeploy — otherwise the deployed form won't save signups.
 
 ## Project structure
 

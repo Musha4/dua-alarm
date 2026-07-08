@@ -9,6 +9,10 @@ const options = [
   { value: "no", label: "No, I only want free" },
 ];
 
+// The vote is stored locally so the waitlist form can attach it to the
+// visitor's signup row (the `pricing_response` column in Supabase).
+export const PRICING_VOTE_KEY = "dua-alarm.pricing-vote";
+
 const premiumIncludes = [
   "The full dua & adhkar library",
   "Advanced streaks and habit stats",
@@ -21,11 +25,12 @@ export default function PricingPoll() {
   function handleVote(value: string) {
     setSelected(value);
 
+    // Remember the vote so WaitlistForm can save it to Supabase as
+    // `pricing_response` when this visitor signs up.
+    localStorage.setItem(PRICING_VOTE_KEY, value);
+
     // Logged with the visitor's headline variant attached (see src/lib/ab.ts).
     trackEvent("pricing_vote", { answer: value });
-
-    // TODO: Persist the vote to Supabase, e.g.:
-    //   await supabase.from("pricing_votes").insert({ answer: value, variant });
   }
 
   return (
