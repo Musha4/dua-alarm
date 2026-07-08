@@ -105,7 +105,7 @@ export function Onboarding1() {
               style={{ transform: `rotate(${deg}deg) translateX(120px)` }}
             />
           ))}
-          <p className="relative font-arabic text-5xl text-[#F7F1E3]" lang="ar" dir="rtl">
+          <p className="relative font-arabic text-5xl leading-[1.6] text-[#F7F1E3]" lang="ar" dir="rtl">
             ذِكْر
           </p>
         </div>
@@ -139,7 +139,7 @@ export function Onboarding2() {
             ))}
           </div>
           <div className="absolute bottom-6 h-px w-72 bg-gradient-to-r from-transparent via-[#E6CE8C]/50 to-transparent" />
-          <p className="relative -mt-10 rounded-2xl bg-white/[0.07] px-5 py-3 font-arabic text-xl text-[#F7F1E3] ring-1 ring-white/10 backdrop-blur" lang="ar" dir="rtl">
+          <p className="relative -mt-10 rounded-2xl bg-white/[0.07] px-5 py-2 font-arabic text-xl leading-[2.1] text-[#F7F1E3] ring-1 ring-white/10 backdrop-blur" lang="ar" dir="rtl">
             أَصْبَحْنَا وَأَصْبَحَ الْمُلْكُ لِلَّهِ
           </p>
         </div>
@@ -175,7 +175,7 @@ export function Onboarding3() {
               style={{ left: x, top: y, width: `${s}px`, height: `${s}px`, animationDelay: `${i * 0.35}s` }}
             />
           ))}
-          <p className="relative mt-24 rounded-2xl bg-white/[0.07] px-5 py-3 font-arabic text-xl text-[#F7F1E3] ring-1 ring-white/10 backdrop-blur" lang="ar" dir="rtl">
+          <p className="relative mt-24 rounded-2xl bg-white/[0.07] px-5 py-2 font-arabic text-xl leading-[2.1] text-[#F7F1E3] ring-1 ring-white/10 backdrop-blur" lang="ar" dir="rtl">
             بِاسْمِكَ اللَّهُمَّ أَمُوتُ وَأَحْيَا
           </p>
         </div>

@@ -283,7 +283,7 @@ export function DuaSelectionScreen() {
                   )}
                 </div>
                 <p className="mt-0.5 text-[12px] text-white/40">{dua.source}</p>
-                <p className="mt-1 truncate font-arabic text-[15px] text-[#E6CE8C]/85" lang="ar" dir="rtl">
+                <p className="mt-0.5 font-arabic text-[15px] leading-[1.9] text-[#E6CE8C]/85" lang="ar" dir="rtl">
                   {dua.arabic}
                 </p>
               </div>

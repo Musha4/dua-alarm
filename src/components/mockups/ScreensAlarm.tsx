@@ -23,7 +23,7 @@ export function AlarmRingingScreen() {
 
         {/* Dua card */}
         <Glass className="mt-6 w-full p-6">
-          <p className="font-arabic text-[26px] leading-[1.9] text-[#F7F1E3]" lang="ar" dir="rtl">
+          <p className="font-arabic text-[26px] leading-[2] text-[#F7F1E3] [text-wrap:balance]" lang="ar" dir="rtl">
             أَصْبَحْنَا وَأَصْبَحَ الْمُلْكُ لِلَّهِ، وَالْحَمْدُ لِلَّهِ
           </p>
           <p className="mt-3 text-[13px] italic text-[#E6CE8C]/80">
@@ -119,7 +119,7 @@ export function ListeningScreen() {
               </span>
             ))}
           </p>
-          <p className="mt-3 font-arabic text-[17px] text-white/45" lang="ar" dir="rtl">
+          <p className="mt-3 font-arabic text-[17px] leading-[1.9] text-white/45" lang="ar" dir="rtl">
             أَصْبَحْنَا وَأَصْبَحَ الْمُلْكُ لِلَّهِ …
           </p>
         </Glass>
