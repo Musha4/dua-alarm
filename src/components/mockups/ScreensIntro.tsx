@@ -176,7 +176,7 @@ export function Onboarding3() {
             />
           ))}
           <p className="relative mt-24 rounded-2xl bg-white/[0.07] px-5 py-2 font-arabic text-xl leading-[2.1] text-[#F7F1E3] ring-1 ring-white/10 backdrop-blur" lang="ar" dir="rtl">
-            بِاسْمِكَ اللَّهُمَّ أَمُوتُ وَأَحْيَا
+            اللَّهُمَّ بِاسْمِكَ أَمُوتُ وَأَحْيَا
           </p>
         </div>
       }

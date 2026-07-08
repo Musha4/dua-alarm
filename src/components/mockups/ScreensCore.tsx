@@ -205,7 +205,7 @@ const duaCards = [
   {
     title: "Bedtime Dua",
     source: "Sahih al-Bukhari · 20s",
-    arabic: "بِاسْمِكَ اللَّهُمَّ أَمُوتُ وَأَحْيَا",
+    arabic: "اللَّهُمَّ بِاسْمِكَ أَمُوتُ وَأَحْيَا",
     icon: "🌙",
     selected: false,
     pro: false,
