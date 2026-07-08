@@ -1,3 +1,5 @@
+import { sendToAnalytics } from "./analytics";
+
 // Lightweight client-side A/B test for the hero headline.
 //
 // How it works:
@@ -55,21 +57,15 @@ export function getHeadlineVariant(): HeadlineVariant {
  * Central event tracker. Every event automatically carries the visitor's
  * headline variant so conversions can be attributed to a headline.
  *
- * For now events go to the browser console. To measure for real, forward
- * the payload to your analytics tool of choice, e.g.:
- *   - Plausible:  window.plausible(event, { props: payload })
- *   - PostHog:    posthog.capture(event, payload)
- *   - Supabase:   await supabase.from("events").insert(payload)
+ * Events are forwarded to the console, Vercel Analytics, and Google
+ * Analytics (when configured) — see src/lib/analytics.ts for setup.
  */
 export function trackEvent(
   event: string,
   props: Record<string, unknown> = {},
 ) {
-  const payload = {
-    event,
+  sendToAnalytics(event, {
     headlineVariant: getHeadlineVariant(),
     ...props,
-    at: new Date().toISOString(),
-  };
-  console.log(`[Dua Alarm] ${event}`, payload);
+  });
 }

@@ -1,9 +1,14 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
+import { useRouter } from "next/navigation";
 import { getHeadlineVariant, trackEvent } from "@/lib/ab";
 import { supabase, PG_UNIQUE_VIOLATION, type WaitlistEntry } from "@/lib/supabase";
 import { PRICING_VOTE_KEY } from "./PricingPoll";
+
+// After signup we send the visitor to /thank-you for a 3-question survey.
+// Their email is stashed here so the survey answers can be linked to them.
+export const SIGNUP_EMAIL_KEY = "dua-alarm.signup-email";
 
 const featureOptions = [
   "Morning dua alarm",
@@ -27,8 +32,14 @@ type Status =
   | "error"; // something went wrong — form stays filled for retry
 
 export default function WaitlistForm() {
+  const router = useRouter();
   const [status, setStatus] = useState<Status>("idle");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  function goToThankYou(email: string) {
+    localStorage.setItem(SIGNUP_EMAIL_KEY, email);
+    router.push("/thank-you");
+  }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -60,6 +71,7 @@ export default function WaitlistForm() {
       );
       trackEvent("waitlist_signup", { ...entry, savedTo: "console-only" });
       setStatus("success");
+      goToThankYou(email);
       return;
     }
 
@@ -74,6 +86,7 @@ export default function WaitlistForm() {
         headlineVariant: getHeadlineVariant(),
       });
       setStatus("success");
+      goToThankYou(email);
       return;
     }
 
@@ -137,6 +150,12 @@ export default function WaitlistForm() {
                     else. We&apos;ll be in touch the moment Dua Alarm is ready,
                     insha&apos;Allah.
                   </p>
+                  <a
+                    href="/thank-you"
+                    className="mt-4 inline-block text-sm font-semibold text-emerald-deep underline underline-offset-4 hover:text-emerald-soft"
+                  >
+                    Answer 3 quick questions to help us build it →
+                  </a>
                 </>
               )}
             </div>
@@ -220,6 +239,12 @@ export default function WaitlistForm() {
                     name="feature"
                     required
                     defaultValue=""
+                    onChange={(event) =>
+                      trackEvent("feature_selected", {
+                        feature: event.target.value,
+                        location: "waitlist_form",
+                      })
+                    }
                     className="w-full appearance-none rounded-xl border border-cream-dark bg-cream px-4 py-3 text-night focus:border-emerald-deep focus:outline-none focus:ring-2 focus:ring-emerald-deep/20"
                   >
                     <option value="" disabled>

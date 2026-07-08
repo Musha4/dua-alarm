@@ -44,9 +44,33 @@ How it works:
   visitor's stored assignment.
 - To add/edit variants, change `HEADLINE_VARIANTS` in `src/lib/ab.ts`.
 
-Events currently go to the browser console via `trackEvent()`. To measure for
-real, forward the payload in that one function to Plausible, PostHog, GA4, or
-a Supabase `events` table — comments inline show how.
+## Analytics
+
+All events flow through [`src/lib/analytics.ts`](src/lib/analytics.ts) and are
+forwarded to every active destination:
+
+- **Browser console** — always on, so you can watch events in dev.
+- **Vercel Analytics** — no tracking ID needed. Deploy on Vercel, then enable
+  Analytics in the project dashboard. (Custom events need the paid tier; page
+  views are free.)
+- **Google Analytics** — set `NEXT_PUBLIC_GA_ID=G-XXXXXXXXXX` in `.env.local`
+  (see `.env.local.example` for where to find the ID). The gtag scripts in
+  `src/app/layout.tsx` only load when the ID is set.
+
+Tracked events: `page_view`, `headline_viewed`, `waitlist_cta_click` (every
+"Get Early Access" button, with its location), `feature_selected`,
+`waitlist_signup`, `waitlist_duplicate`, `pricing_vote`,
+`reserve_premium_click`, `faq_opened`, and `survey_submitted` — each carrying
+the visitor's headline variant.
+
+## Thank-you survey (/thank-you)
+
+After a successful signup the visitor is redirected to `/thank-you`, which
+asks three questions — beta tester? reserve Premium at $3.99/month? most
+wanted feature? — and saves the answers to the `survey_responses` table in
+Supabase, linked to the signup email. The table is created by the same
+[`supabase/schema.sql`](supabase/schema.sql) file (safe to re-run if you set
+up before it existed).
 
 ## Local setup
 

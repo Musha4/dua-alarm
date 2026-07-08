@@ -1,3 +1,7 @@
+"use client";
+
+import { trackEvent } from "@/lib/ab";
+
 const faqs = [
   {
     question: "Is the app available now?",
@@ -43,6 +47,11 @@ export default function Faq() {
           {faqs.map((faq) => (
             <details
               key={faq.question}
+              onToggle={(event) => {
+                if (event.currentTarget.open) {
+                  trackEvent("faq_opened", { question: faq.question });
+                }
+              }}
               className="group rounded-2xl border border-cream-dark bg-white/60 px-6 py-4 shadow-sm"
             >
               <summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-semibold text-night [&::-webkit-details-marker]:hidden">
@@ -76,6 +85,7 @@ export default function Faq() {
           </p>
           <a
             href="#waitlist"
+            onClick={() => trackEvent("waitlist_cta_click", { location: "faq" })}
             className="mt-6 inline-block rounded-full bg-gold px-8 py-4 text-base font-bold text-night shadow-lg shadow-gold/25 transition-all hover:-translate-y-0.5 hover:bg-gold-light"
           >
             Get Early Access

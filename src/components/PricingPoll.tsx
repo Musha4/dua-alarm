@@ -101,7 +101,7 @@ export default function PricingPoll() {
                 —{" "}
                 <a
                   href="#waitlist"
-                  onClick={() => trackEvent("cta_click", { cta: "pricing_waitlist" })}
+                  onClick={() => trackEvent("waitlist_cta_click", { location: "pricing" })}
                   className="font-semibold text-gold-light underline underline-offset-4 hover:text-gold"
                 >
                   join the waitlist

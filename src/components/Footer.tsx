@@ -26,16 +26,16 @@ export default function Footer() {
           </p>
 
           <nav className="flex gap-6 text-sm text-cream/70">
-            <a href="#how-it-works" className="transition-colors hover:text-cream">
+            <a href="/#how-it-works" className="transition-colors hover:text-cream">
               How it works
             </a>
-            <a href="#features" className="transition-colors hover:text-cream">
+            <a href="/#features" className="transition-colors hover:text-cream">
               Features
             </a>
-            <a href="#waitlist" className="transition-colors hover:text-cream">
+            <a href="/#waitlist" className="transition-colors hover:text-cream">
               Waitlist
             </a>
-            <a href="#faq" className="transition-colors hover:text-cream">
+            <a href="/#faq" className="transition-colors hover:text-cream">
               FAQ
             </a>
           </nav>

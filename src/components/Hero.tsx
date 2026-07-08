@@ -55,7 +55,7 @@ export default function Hero() {
           <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center md:justify-start">
             <a
               href="#waitlist"
-              onClick={() => trackEvent("cta_click", { cta: "hero_waitlist" })}
+              onClick={() => trackEvent("waitlist_cta_click", { location: "hero" })}
               className="w-full rounded-full bg-gold px-8 py-4 text-center text-base font-bold text-night shadow-lg shadow-gold/25 transition-all hover:-translate-y-0.5 hover:bg-gold-light sm:w-auto"
             >
               Get Early Access

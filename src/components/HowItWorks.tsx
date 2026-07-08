@@ -1,3 +1,5 @@
+import TrackedLink from "./TrackedLink";
+
 const steps = [
   {
     number: "1",
@@ -56,12 +58,14 @@ export default function HowItWorks() {
         </div>
 
         <div className="mt-10 text-center md:mt-12">
-          <a
+          <TrackedLink
             href="#waitlist"
+            event="waitlist_cta_click"
+            eventProps={{ location: "how_it_works" }}
             className="inline-block rounded-full bg-gold px-8 py-4 text-base font-bold text-night shadow-lg shadow-gold/25 transition-all hover:-translate-y-0.5 hover:bg-gold-light"
           >
             Get Early Access
-          </a>
+          </TrackedLink>
           <p className="mt-3 text-sm text-cream/55">
             Takes 20 seconds · Free Premium at launch for early members
           </p>

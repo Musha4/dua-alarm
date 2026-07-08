@@ -33,5 +33,13 @@ export type WaitlistEntry = {
   // headline_variant: string; // uncomment along with the column in schema.sql
 };
 
+/** Shape of a row in the `survey_responses` table (see supabase/schema.sql). */
+export type SurveyResponse = {
+  email: string | null;
+  beta_tester: boolean;
+  reserve_premium: boolean;
+  preferred_feature: string;
+};
+
 /** Postgres error code for a unique-constraint violation (duplicate email). */
 export const PG_UNIQUE_VIOLATION = "23505";

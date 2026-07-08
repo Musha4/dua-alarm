@@ -49,3 +49,37 @@ create policy "Anyone can join the waitlist"
   for insert
   to anon
   with check (true);
+
+-- ============================================================
+-- Dua Alarm — thank-you survey responses
+-- ============================================================
+-- Answers to the 3 questions on the /thank-you page, shown right
+-- after someone joins the waitlist.
+--
+-- ALREADY RAN THE FILE BEFORE THIS TABLE EXISTED?
+-- Just paste the whole file into the SQL Editor and run it again —
+-- everything above uses "if not exists", so re-running is safe.
+
+create table if not exists public.survey_responses (
+  id uuid primary key default gen_random_uuid(),
+  -- The signer-upper's email (links the survey to their waitlist row).
+  -- Nullable: someone could open /thank-you directly.
+  email text,
+  -- "Would you like to be a beta tester?"
+  beta_tester boolean,
+  -- "Would you reserve Premium at $3.99/month?"
+  reserve_premium boolean,
+  -- "What feature do you want most?"
+  preferred_feature text,
+  created_at timestamptz not null default now()
+);
+
+alter table public.survey_responses enable row level security;
+
+-- Same model as the waitlist: anonymous visitors can submit answers,
+-- but only you (via the dashboard) can read them.
+create policy "Anyone can submit survey responses"
+  on public.survey_responses
+  for insert
+  to anon
+  with check (true);
