@@ -28,8 +28,8 @@ const faqs = [
 
 export default function Faq() {
   return (
-    <section id="faq" className="bg-cream pb-20 md:pb-28">
-      <div className="mx-auto max-w-2xl px-4 sm:px-6">
+    <section id="faq" className="bg-cream pb-16 md:pb-24">
+      <div className="mx-auto max-w-2xl px-5 sm:px-6">
         <div className="text-center">
           <p className="text-sm font-semibold uppercase tracking-[0.15em] text-gold">
             FAQ
@@ -63,6 +63,23 @@ export default function Faq() {
               <p className="mt-3 leading-relaxed text-ink-soft">{faq.answer}</p>
             </details>
           ))}
+        </div>
+
+        {/* Final CTA */}
+        <div className="mt-12 rounded-3xl bg-night p-8 text-center sm:p-10">
+          <h3 className="font-display text-2xl font-semibold text-cream">
+            Start your streak on day one
+          </h3>
+          <p className="mx-auto mt-2 max-w-sm text-sm text-cream/65">
+            Join the founding list — free Premium at launch, and a say in what
+            we build first.
+          </p>
+          <a
+            href="#waitlist"
+            className="mt-6 inline-block rounded-full bg-gold px-8 py-4 text-base font-bold text-night shadow-lg shadow-gold/25 transition-all hover:-translate-y-0.5 hover:bg-gold-light"
+          >
+            Get Early Access
+          </a>
         </div>
       </div>
     </section>

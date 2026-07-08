@@ -1,20 +1,18 @@
 "use client";
 
 import { useState } from "react";
+import { trackEvent } from "@/lib/ab";
 
 const options = [
-  {
-    value: "yes",
-    label: "Yes, if it helps me stay consistent",
-  },
-  {
-    value: "maybe",
-    label: "Maybe",
-  },
-  {
-    value: "no",
-    label: "No, I only want free",
-  },
+  { value: "yes", label: "Yes, if it helps me stay consistent" },
+  { value: "maybe", label: "Maybe" },
+  { value: "no", label: "No, I only want free" },
+];
+
+const premiumIncludes = [
+  "The full dua & adhkar library",
+  "Advanced streaks and habit stats",
+  "Family mode — build the habit together",
 ];
 
 export default function PricingPoll() {
@@ -23,31 +21,49 @@ export default function PricingPoll() {
   function handleVote(value: string) {
     setSelected(value);
 
-    // For now we just log the vote locally.
-    console.log("[Dua Alarm] Pricing poll response:", { answer: value });
+    // Logged with the visitor's headline variant attached (see src/lib/ab.ts).
+    trackEvent("pricing_vote", { answer: value });
 
     // TODO: Persist the vote to Supabase, e.g.:
-    //   await supabase.from("pricing_votes").insert({ answer: value });
-    // Or send it to any analytics tool (Plausible, PostHog, GA4) as a custom event.
+    //   await supabase.from("pricing_votes").insert({ answer: value, variant });
   }
 
   return (
-    <section id="pricing" className="relative overflow-hidden bg-emerald-deep py-20 md:py-28">
+    <section id="pricing" className="relative overflow-hidden bg-emerald-deep py-16 md:py-24">
       <div className="pattern-star absolute inset-0 opacity-[0.06]" aria-hidden="true" />
 
-      <div className="relative mx-auto max-w-3xl px-4 text-center sm:px-6">
+      <div className="relative mx-auto max-w-3xl px-5 text-center sm:px-6">
         <p className="text-sm font-semibold uppercase tracking-[0.15em] text-gold-light">
-          Help us shape it
+          One honest question
         </p>
         <h2 className="mt-3 font-display text-3xl font-semibold text-cream sm:text-4xl">
           Would you consider Premium for $3.99/month?
         </h2>
         <p className="mt-4 text-lg text-cream/70">
-          Premium would unlock the full dua library, advanced streaks, and
-          family mode. Your honest answer helps us build the right thing.
+          The core alarm stays free, always. Premium would add:
         </p>
 
-        <div className="mt-10 flex flex-col gap-3 sm:mx-auto sm:max-w-md">
+        <ul className="mx-auto mt-5 flex max-w-sm flex-col gap-2.5 text-left">
+          {premiumIncludes.map((item) => (
+            <li key={item} className="flex items-start gap-3 text-cream/85">
+              <svg
+                viewBox="0 0 16 16"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="mt-1 h-4 w-4 shrink-0 text-gold-light"
+                aria-hidden="true"
+              >
+                <path d="m3 8.5 3 3 7-7" />
+              </svg>
+              {item}
+            </li>
+          ))}
+        </ul>
+
+        <div className="mt-8 flex flex-col gap-3 sm:mx-auto sm:max-w-md">
           {options.map((option) => {
             const isSelected = selected === option.value;
             return (
@@ -68,13 +84,28 @@ export default function PricingPoll() {
           })}
         </div>
 
-        <p
-          aria-live="polite"
-          className="mt-6 min-h-6 text-sm font-medium text-gold-light"
-        >
-          {selected !== null &&
-            "JazakAllahu khayran — your answer has been counted."}
-        </p>
+        <div aria-live="polite" className="mt-6 min-h-14">
+          {selected !== null && (
+            <div className="mx-auto max-w-md">
+              <p className="text-sm font-medium text-gold-light">
+                JazakAllahu khayran — your answer has been counted.
+              </p>
+              <p className="mt-2 text-sm text-cream/70">
+                Whatever you answered, early members get Premium{" "}
+                <span className="font-semibold text-cream">free at launch</span>{" "}
+                —{" "}
+                <a
+                  href="#waitlist"
+                  onClick={() => trackEvent("cta_click", { cta: "pricing_waitlist" })}
+                  className="font-semibold text-gold-light underline underline-offset-4 hover:text-gold"
+                >
+                  join the waitlist
+                </a>
+                .
+              </p>
+            </div>
+          )}
+        </div>
       </div>
     </section>
   );

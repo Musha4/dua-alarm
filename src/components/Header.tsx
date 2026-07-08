@@ -27,7 +27,7 @@ export default function Header() {
           href="#waitlist"
           className="rounded-full bg-emerald-deep px-5 py-2.5 text-sm font-semibold text-cream shadow-sm transition-colors hover:bg-emerald-soft"
         >
-          Join the Waitlist
+          Get Early Access
         </a>
       </div>
     </header>

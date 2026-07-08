@@ -2,31 +2,31 @@ const steps = [
   {
     number: "1",
     title: "Set your alarm",
-    body: "Pick your wake-up time and your wind-down time for bed — just like any alarm app.",
+    body: "Pick your wake-up time and your wind-down time for bed — it works just like the alarm you already use.",
   },
   {
     number: "2",
     title: "Choose your dua",
-    body: "Select a morning or bedtime dua from an authentic collection, with Arabic, transliteration, and translation.",
+    body: "Select a morning or bedtime dua from an authentic collection — Arabic, transliteration, and translation included.",
   },
   {
     number: "3",
     title: "Recite to complete",
-    body: "When the alarm rings, your dua appears on screen. Recite it, then mark it complete to dismiss the alarm.",
+    body: "When the alarm rings, your dua appears on screen. Recite it, mark it complete, and the alarm turns off.",
   },
   {
     number: "4",
     title: "Build your streak",
-    body: "Every completed dua grows your streak — a gentle push to keep your remembrance consistent, day after day.",
+    body: "Every completed dua grows your streak — gentle motivation to keep your remembrance consistent, day after day.",
   },
 ];
 
 export default function HowItWorks() {
   return (
-    <section id="how-it-works" className="relative overflow-hidden bg-emerald-deep py-20 md:py-28">
+    <section id="how-it-works" className="relative overflow-hidden bg-emerald-deep py-16 md:py-24">
       <div className="pattern-star absolute inset-0 opacity-[0.06]" aria-hidden="true" />
 
-      <div className="relative mx-auto max-w-6xl px-4 sm:px-6">
+      <div className="relative mx-auto max-w-6xl px-5 sm:px-6">
         <div className="mx-auto max-w-2xl text-center">
           <p className="text-sm font-semibold uppercase tracking-[0.15em] text-gold-light">
             How it works
@@ -36,7 +36,7 @@ export default function HowItWorks() {
           </h2>
         </div>
 
-        <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-10 grid gap-5 sm:grid-cols-2 md:mt-14 md:gap-6 lg:grid-cols-4">
           {steps.map((step) => (
             <div
               key={step.number}
@@ -53,6 +53,18 @@ export default function HowItWorks() {
               </p>
             </div>
           ))}
+        </div>
+
+        <div className="mt-10 text-center md:mt-12">
+          <a
+            href="#waitlist"
+            className="inline-block rounded-full bg-gold px-8 py-4 text-base font-bold text-night shadow-lg shadow-gold/25 transition-all hover:-translate-y-0.5 hover:bg-gold-light"
+          >
+            Get Early Access
+          </a>
+          <p className="mt-3 text-sm text-cream/55">
+            Takes 20 seconds · Free Premium at launch for early members
+          </p>
         </div>
       </div>
     </section>

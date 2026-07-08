@@ -21,6 +21,33 @@ and ready to deploy on Vercel.
 The pricing poll and waitlist form currently **log responses to the browser
 console** — see below to connect a real backend.
 
+## Headline A/B test
+
+Three hero headlines are being tested (defined in
+[`src/lib/ab.ts`](src/lib/ab.ts)):
+
+| Variant | Headline |
+| --- | --- |
+| `a` | Wake up with remembrance. |
+| `b` | The alarm that helps you never miss your morning dua. |
+| `c` | Build the habit of remembering Allah every morning. |
+
+How it works:
+
+- Each visitor is **randomly assigned** a variant on first visit; the
+  assignment is stored in `localStorage` so it stays stable across visits.
+- Every tracked event — `headline_viewed`, `cta_click`, `pricing_vote`,
+  `waitlist_signup` — includes the visitor's `headlineVariant`, so you can
+  compare signup conversion per headline.
+- **Preview a specific variant** with `?v=a`, `?v=b`, or `?v=c` in the URL
+  (e.g. `localhost:3000/?v=c`). This overrides the view without changing the
+  visitor's stored assignment.
+- To add/edit variants, change `HEADLINE_VARIANTS` in `src/lib/ab.ts`.
+
+Events currently go to the browser console via `trackEvent()`. To measure for
+real, forward the payload in that one function to Plausible, PostHog, GA4, or
+a Supabase `events` table — comments inline show how.
+
 ## Local setup
 
 Requires Node.js 18.18+ (20+ recommended).

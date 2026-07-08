@@ -3,6 +3,7 @@ import Hero from "@/components/Hero";
 import Problem from "@/components/Problem";
 import HowItWorks from "@/components/HowItWorks";
 import Features from "@/components/Features";
+import Trust from "@/components/Trust";
 import PricingPoll from "@/components/PricingPoll";
 import WaitlistForm from "@/components/WaitlistForm";
 import Faq from "@/components/Faq";
@@ -17,6 +18,7 @@ export default function Home() {
         <Problem />
         <HowItWorks />
         <Features />
+        <Trust />
         <PricingPoll />
         <WaitlistForm />
         <Faq />
