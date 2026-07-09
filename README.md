@@ -72,6 +72,48 @@ Supabase, linked to the signup email. The table is created by the same
 [`supabase/schema.sql`](supabase/schema.sql) file (safe to re-run if you set
 up before it existed).
 
+## The MVP app (/app)
+
+Alongside the landing page, this repo now contains a working MVP of Dua
+Alarm itself at **`/app`** — a mobile-first, PWA-style web app:
+
+- **Home** (`/app`) — greeting, Hijri date, streak card, next alarm with
+  toggle + preview, quick actions, bottom navigation
+- **New Alarm** (`/app/new`) — time picker, Morning/Bedtime, repeat, dua
+  picker, sound, "recite to dismiss" toggle
+- **Dua Library** (`/app/duas`) — Morning Dua, Bedtime Dua, Ayat al-Kursi
+  with Arabic, transliteration, translation, and duration
+- **Ring screen** (`/app/ring`) — the core loop: a looping chime
+  (generated with WebAudio, no audio files), the dua on screen, and a mic
+  button. Tapping the mic starts listening — **the alarm keeps ringing**.
+  Recognition (browser Web Speech API, Arabic) is fuzzy-matched against
+  both the Arabic text and the transliteration; at **80% coverage** the
+  alarm stops automatically and the Success screen shows. A quiet
+  "Can't speak right now?" fallback exists for testing/unsupported
+  browsers. Snooze reschedules 5 minutes out.
+- **Streaks** (`/app/streaks`) — current/longest streak and history
+
+**Data**: localStorage is the source of truth (works with zero setup);
+when Supabase is configured every alarm/completion is also mirrored to
+the tables in [`supabase/app-schema.sql`](supabase/app-schema.sql) —
+run that file in the SQL Editor (it also seeds `dua_library`). Identity
+is an anonymous per-device UUID; the SQL file documents how to upgrade
+to real Supabase Auth.
+
+**Known MVP limitations** (stated in-app):
+
+- Browsers cannot wake a closed tab — alarms ring only while the tab is
+  open. `src/components/app/AlarmScheduler.tsx` documents the upgrade
+  paths (Capacitor local notifications, native alarms, or Web Push via a
+  service worker + Supabase Edge Function cron).
+- Web Speech recognition needs Chrome/Edge/Safari and mic permission;
+  otherwise the fallback button is shown.
+- Recognition may struggle with the chime playing — use earphones or
+  the fallback while testing.
+
+Install it like an app: open `/app` on your phone → browser menu →
+**Add to Home Screen** (a web manifest is included).
+
 ## Local setup
 
 Requires Node.js 18.18+ (20+ recommended).
